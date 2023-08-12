@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/chat_background"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_dark"
+    tools:context="com.example.whatsappduplicate.ChatActivity">
+    <include
+        android:id="@+id/custom_chat_bar"
+        layout="@layout/custom_chat_bar"
+        >
+
+    </include>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/chat_recycler_view"
+        android:layout_above="@id/card_view"
+        android:layout_below="@id/custom_chat_bar"
+        >
+    </androidx.recyclerview.widget.RecyclerView>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:id="@+id/card_view"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        app:cardCornerRadius="100dp"
+        android:layout_alignParentEnd="true"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:background="@android:color/darker_gray"
+
+            >
+    <EditText
+        android:padding="7dp"
+        android:layout_width="match_parent"
+        android:id="@+id/chat_input_message"
+        android:layout_height="60dp"
+        android:layout_marginStart="18dp"
+        android:hint="enter message"
+        android:textColorHint="@android:color/black"
+        android:textColor="@android:color/black"
+        android:layout_marginEnd="100dp"
+
+        >
+    </EditText>
+    <ImageButton
+        android:layout_marginStart="-105dp"
+        android:id="@+id/file_attachment"
+        android:layout_width="30dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_baseline_attach_file_24"
+        android:background="@android:color/darker_gray"
+        >
+
+    </ImageButton>
+            <ImageButton
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center"
+                android:id="@+id/send_message_chat"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_baseline_send_24"
+                android:backgroundTint="@color/colorPrimary"
+                android:background="@drawable/shapebtn"
+                >
+
+            </ImageButton>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

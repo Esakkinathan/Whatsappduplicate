@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="true" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/images"
+        android:label="WhatsappDuplicate"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        tools:targetApi="31">
+        <service
+            android:name="com.example.whatsappduplicate.FirebaseMessagingService"
+            android:permission="TODO"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <activity
+            android:name="com.example.whatsappduplicate.ImageViewActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.StatusActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.FindFriends"
+            android:exported="false"
+            android:parentActivityName="com.example.whatsappduplicate.MainActivity" />
+        <activity
+            android:name="com.example.whatsappduplicate.SettingsActivity"
+            android:exported="false"
+            android:parentActivityName="com.example.whatsappduplicate.MainActivity" />
+        <activity
+            android:name="com.example.whatsappduplicate.LogInSignUp.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.LogInSignUp.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.LogInSignUp.PhonelogInActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.whatsappduplicate.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Base.Theme.AppCompat" />
+    </application>
+
+</manifest>

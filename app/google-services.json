@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "624420748528",
+    "firebase_url": "https://whatsappduplicate-581ea-default-rtdb.firebaseio.com",
+    "project_id": "whatsappduplicate-581ea",
+    "storage_bucket": "whatsappduplicate-581ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624420748528:android:3be1be23ae7e0a22911635",
+        "android_client_info": {
+          "package_name": "com.example.Whatsappduplicate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "624420748528-qur6igc1i5104qsck41jjc9d0g0scq34.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.whatsappduplicate",
+            "certificate_hash": "f3b51572b6a22588d2290b729ca7f6bba0894ac0"
+          }
+        },
+        {
+          "client_id": "624420748528-36ialm0dse7l9sjns9i9vnfgjqroevup.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA87ZDYDCfFdpKK4Oqu04yvYtHWDwdS1yw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "624420748528-36ialm0dse7l9sjns9i9vnfgjqroevup.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
