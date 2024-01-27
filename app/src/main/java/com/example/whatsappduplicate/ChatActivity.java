@@ -45,6 +45,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.Whatsappduplicate.R;
 
+import com.example.whatsappduplicate.helper.LocationHelper;
 import com.example.whatsappduplicate.helper.MessageAdaptar;
 import com.example.whatsappduplicate.helper.Messages;
 
@@ -89,6 +90,7 @@ import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import top.defaults.colorpicker.ColorPickerPopup;
+import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class ChatActivity extends AppCompatActivity {
     ImageButton sendMsg, sendFiles;
@@ -115,7 +117,7 @@ public class ChatActivity extends AppCompatActivity {
     String recName;
     FusedLocationProviderClient mFusedLocationClient;
     boolean toNotify = false;
-
+    boolean onlineState;
     private static final int REQUEST_LOCATION = 1;
     int PERMISSION_ID = 44;
     LocationManager locationManager;
@@ -125,7 +127,7 @@ public class ChatActivity extends AppCompatActivity {
     double longitude;
     double latitude;
     int mDefaultColor;
-
+    private LocationHelper locationHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -196,7 +198,6 @@ public class ChatActivity extends AppCompatActivity {
                             String token = Objects.requireNonNull(task.getResult()).getToken();
 
                         }
-
                     }
                 });
 
@@ -281,8 +282,10 @@ public class ChatActivity extends AppCompatActivity {
                             startActivityForResult(intent, 438);
                         }
                         if (i == 3) {
-                            gotoFuse();
+                            gotolocationclass();
+
                             //SendMessageLocation(latitude, longitude);
+                            //gotoFuse();
                         }
                         if(i==4){
                             //checker = "background-image";
@@ -290,7 +293,7 @@ public class ChatActivity extends AppCompatActivity {
                             //intent.setType("image/*");
                             //intent.setAction(Intent.ACTION_GET_CONTENT);
                             //startActivityForResult(Intent.createChooser(intent, "Select Image from here"),
-                             //       438);
+                            //       438);
                             chooseBackgroundColor();
                         }
                     }
@@ -299,6 +302,51 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
         setRecyclerView();
+    }
+
+    private void gotolocationclass() {
+        if (checkPermissions()) {
+
+            // check if location is enabled
+            if (isLocationEnabled()) {
+                progressDialog.setTitle("sending live location");
+                progressDialog.setMessage("work in progress");
+                progressDialog.setCancelable(false); // Prevent the user from canceling i
+                progressDialog.show();
+                locationHelper = new LocationHelper(getApplicationContext());
+
+                locationHelper.startLocationUpdates(new LocationHelper.LocationCallbackListener() {
+                    @Override
+                    public void onLocationResult(Location location) {
+                        // Handle the location update here
+                        if(location!=null){
+                            progressDialog.dismiss();
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+                            // Do something with the location data
+                            SendMessageLocation(latitude, longitude);
+                            locationHelper.stopLocationUpdates(); // Stop location updates after receiving one
+                            locationHelper = null;
+                        }
+                        else{
+                            progressDialog.dismiss();
+                            Toast.makeText(getApplicationContext(), "Please try again later", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+            else {
+                Toast.makeText(this, "please turn on" + " your location...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+            }
+
+        } else {
+            // if permissions aren't available,
+            // request for permissions
+            requestPermissions();
+        }
+
     }
 
 
@@ -358,9 +406,30 @@ public class ChatActivity extends AppCompatActivity {
 
     }
     private boolean checkOffline() {
-        if (RootRef.child("Users").child(msgRecId).child("userState").child("state").equals("online")) {
+
+
+        RootRef.child("Users").child(msgRecId).child("userState").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child("state").getValue().toString().equals("online")) {
+                    onlineState = true;
+                }
+                else{
+                    onlineState = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        Toast.makeText(getApplicationContext(), "" +onlineState, Toast.LENGTH_SHORT).show();
+        if (onlineState) {
+            Log.d("oombu","false");
             return false;
         } else {
+            Log.d("oombu","true");
             return true;
         }
     }
@@ -424,9 +493,9 @@ public class ChatActivity extends AppCompatActivity {
             messageBodyDetails.put(messageRecieverRef + "/" + messagePushId, messageTextReady);
             RootRef.updateChildren(messageBodyDetails);
             message.setText("");
+            //Toast.makeText(getApplicationContext(), "" + checkOffline(), Toast.LENGTH_SHORT).show();
+            if (toNotify) {
 
-            if (toNotify && checkOffline()) {
-                Log.d("poda punda","notifaction has been sent");
                 //Toast.makeText(this, "" + recName + recToken, Toast.LENGTH_SHORT).show();
                 FcmNotificationsSender notificationsSender = new FcmNotificationsSender(recToken, "New Message from " + recName, messageText, getApplicationContext(), ChatActivity.this);
                 notificationsSender.SendNotifications();
@@ -454,38 +523,38 @@ public class ChatActivity extends AppCompatActivity {
     }
     private void SetBackground() {
         //StorageReference storageReference = FirebaseStorage.getInstance().getReference().
-                //child("Profile Images/" + currentUser + ".jpg");
+        //child("Profile Images/" + currentUser + ".jpg");
         StorageReference setbg = backgroundRefernce.child(cUID+msgRecId+ ".jpg");
         Log.v("Background Image name:",setbg.toString());
-            setbg.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Glide.with(ChatActivity.this)
-                            .load(uri)
-                            .into(new SimpleTarget<Drawable>() {
-                                @Override
-                                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                    relativeLayout.setBackground(resource);
-                                }
+        setbg.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(ChatActivity.this)
+                        .load(uri)
+                        .into(new SimpleTarget<Drawable>() {
+                            @Override
+                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                relativeLayout.setBackground(resource);
+                            }
 
-                                @Override
-                                public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                                    // Handle failure to load the image here
-                                    relativeLayout.setBackgroundResource(R.drawable.chat_wall);
-                                }
+                            @Override
+                            public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                                // Handle failure to load the image here
+                                relativeLayout.setBackgroundResource(R.drawable.chat_wall);
+                            }
 
-                                @Override
-                                public void onLoadStarted(@Nullable Drawable placeholder) {
-                                    // Handle image loading progress here (if needed)
-                                }
-                            });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    relativeLayout.setBackgroundResource(R.drawable.chat_wall);
-                }
-            });
+                            @Override
+                            public void onLoadStarted(@Nullable Drawable placeholder) {
+                                // Handle image loading progress here (if needed)
+                            }
+                        });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                relativeLayout.setBackgroundResource(R.drawable.chat_wall);
+            }
+        });
 
     }
 
@@ -541,7 +610,7 @@ public class ChatActivity extends AppCompatActivity {
                 }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        if (toNotify && checkOffline()) {
+                        if (toNotify) {
                             //Toast.makeText(this, "" + recName + recToken, Toast.LENGTH_SHORT).show();
                             FcmNotificationsSender notificationsSender = new FcmNotificationsSender(recToken, "New Message from " + recName, "Sent You a document", getApplicationContext(), ChatActivity.this);
                             notificationsSender.SendNotifications();
@@ -585,7 +654,7 @@ public class ChatActivity extends AppCompatActivity {
                         RootRef.updateChildren(messageBodyDetails);
                         message.setText("");
                         progressDialog.dismiss();
-                        if (toNotify && checkOffline()) {
+                        if (toNotify) {
                             //Toast.makeText(this, "" + recName + recToken, Toast.LENGTH_SHORT).show();
                             FcmNotificationsSender notificationsSender = new FcmNotificationsSender(recToken, "New Message from " + recName, "Sent you an image", getApplicationContext(), ChatActivity.this);
                             notificationsSender.SendNotifications();
@@ -648,16 +717,16 @@ public class ChatActivity extends AppCompatActivity {
                         true)
                 .build()
                 .show(new ColorPickerPopup.ColorPickerObserver() {
-                            @Override
-                            public void
-                            onColorPicked(int color) {
-                                Log.v("Color code:",""+color);
-                                mDefaultColor = color;
-                                backRef.child(cUID).child(msgRecId).child("color").setValue(mDefaultColor);
-                                //relativeLayout.setBackgroundColor(mDefaultColor);
-                                setBackgroundColor();
-                            }
-                        });
+                    @Override
+                    public void
+                    onColorPicked(int color) {
+                        Log.v("Color code:",""+color);
+                        mDefaultColor = color;
+                        backRef.child(cUID).child(msgRecId).child("color").setValue(mDefaultColor);
+                        //relativeLayout.setBackgroundColor(mDefaultColor);
+                        setBackgroundColor();
+                    }
+                });
     }
     private boolean checkPermissions() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -684,7 +753,7 @@ public class ChatActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 gotoFuse();;
             } else {
-                requestPermissions();
+
                 // Location permission denied, handle the case when the user denies the permission
                 // You may show a message or take appropriate action
             }
@@ -715,8 +784,8 @@ public class ChatActivity extends AppCompatActivity {
             };
         }
         else{
-                Toast.makeText(getApplicationContext(), "please try again later", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(getApplicationContext(), "please try again later", Toast.LENGTH_SHORT).show();
+        }
     }
     private void getLastLocation() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -809,12 +878,12 @@ public class ChatActivity extends AppCompatActivity {
         messageBodyDetails.put(messageRecieverRef + "/" + messagePushId, messageTextReady);
         RootRef.updateChildren(messageBodyDetails);
         message.setText("");
-        if(toNotify && checkOffline()) {
+        if(toNotify) {
             FcmNotificationsSender notificationsSender = new FcmNotificationsSender(recToken, "New Message from " + recName, "Shared live location", getApplicationContext(), ChatActivity.this);
             notificationsSender.SendNotifications();
         }
 
-        }
+    }
 
 
 }
